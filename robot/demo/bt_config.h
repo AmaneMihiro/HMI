@@ -6,7 +6,7 @@
  * 外层帧：0xA5 | type | len | payload[len] | xor。xor 从 type 异或到 payload 末字节。
  * 手机按住蜂鸣器时每 BT_BUZZER_REPEAT_MS 重发整份 bt_cmd_t。
  * 超过 BT_BUZZER_HOLD_MS 没收到新命令，蜂鸣器停止，LED 保持上一份命令。
- * 板子 10 Hz 发送 bt_report_t。角度单位是度。 */
+ * 板子 100 Hz 发送 bt_report_t。角度单位是度。 */
 
 #define BT_SOF                 0xA5u
 #define BT_TYPE_REPORT         0x01u

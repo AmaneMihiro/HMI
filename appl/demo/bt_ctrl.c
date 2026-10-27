@@ -63,4 +63,4 @@ static void bt_ctrl_run(void *argument)
     report.buzzer = sounding ? 1u : 0u;
     (void)hc04_send(BT_TYPE_REPORT, &report, (uint8_t)sizeof report);
 }
-PERIOD_TASK_DEFINE(bt_ctrl_task, OS_FREQ_10HZ, OS_PRIORITY_LOW, OS_STACK_MEDIUM, bt_ctrl_run, NULL);
+PERIOD_TASK_DEFINE(bt_ctrl_task, OS_FREQ_100HZ, OS_PRIORITY_LOW, OS_STACK_MEDIUM, bt_ctrl_run, NULL);

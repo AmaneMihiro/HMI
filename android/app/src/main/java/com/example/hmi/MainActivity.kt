@@ -111,8 +111,8 @@ private fun HmiScreen(link: HmiLink) {
             AngleRow("Pitch", state.attitudeValid, state.pitch)
             AngleRow("Yaw", state.attitudeValid, state.yaw)
             HorizontalDivider()
-            HoldRow("蜂鸣器", "按住时响", state.buzzer, state.connected) { link.setBuzzer(it) }
-            ControlRow("LED", "拨动一次切换亮灭", state.led, state.connected) { link.setLed(it) }
+            HoldRow("蜂鸣器", state.buzzer, state.connected) { link.setBuzzer(it) }
+            ControlRow("LED", state.led, state.connected) { link.setLed(it) }
         }
     }
 }
@@ -129,7 +129,6 @@ private fun AngleRow(label: String, valid: Boolean, degrees: Float) {
 @Composable
 private fun HoldRow(
     title: String,
-    subtitle: String,
     held: Boolean,
     enabled: Boolean,
     onHold: (Boolean) -> Unit,
@@ -139,10 +138,7 @@ private fun HoldRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall)
-        }
+        Text(title, style = MaterialTheme.typography.titleMedium)
         Surface(
             color = if (held) {
                 MaterialTheme.colorScheme.primary
@@ -164,7 +160,7 @@ private fun HoldRow(
             },
         ) {
             Text(
-                if (held) "松开停止" else "按住",
+                "响",
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                 color = if (held) {
                     MaterialTheme.colorScheme.onPrimary
@@ -179,7 +175,6 @@ private fun HoldRow(
 @Composable
 private fun ControlRow(
     title: String,
-    subtitle: String,
     checked: Boolean,
     enabled: Boolean,
     onChecked: (Boolean) -> Unit,
@@ -189,10 +184,7 @@ private fun ControlRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall)
-        }
+        Text(title, style = MaterialTheme.typography.titleMedium)
         Switch(checked = checked, onCheckedChange = onChecked, enabled = enabled)
     }
 }
