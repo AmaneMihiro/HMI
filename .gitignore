@@ -1,0 +1,76 @@
+docs
+
+# GCC / arm-none-eabi（Makefile 的 BUILD_DIR = build）
+platform/*/build/
+/output/
+Debug/
+Release/
+*.o
+*.obj
+*.d
+*.su
+*.cyclo
+*.elf
+*.axf
+*.bin
+*.hex
+*.map
+*.list
+*.lst
+*.a
+
+# clangd 本地编译数据库、配置和索引
+/compile_commands.json
+/.clangd
+/.cache/clangd/
+
+# STM32CubeMX 本地缓存（.ioc 需要提交）
+.mxproject
+
+# STM32CubeIDE
+.metadata/
+.settings/
+*.launch
+RemoteSystemsTempFiles/
+
+# Keil MDK（工程文件 *.uvprojx 需要提交）
+*.uvoptx
+*.uvguix.*
+*.bak
+*.crf
+*.lnp
+*.build_log.htm
+*.iex
+JLinkLog.txt
+JLinkSettings.ini
+*.dbgconf
+
+# IAR EWARM
+EWARM/settings/
+*.ewt
+*.ewd
+*.dep
+
+# 编辑器。launch.json / tasks.json 入库；本机路径放 settings.json，不提交
+.vscode/settings.json
+.idea/
+*.swp
+*~
+
+# 本地 AI 编码助手状态和配置
+/.agents/
+/.claude/
+/.codex/
+/.continue/
+/.cursor/
+
+# 系统
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 上位机 / 脚本缓存
+__pycache__/
+*.py[cod]
+.venv/
+venv/

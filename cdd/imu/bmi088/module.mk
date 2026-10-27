@@ -1,0 +1,1 @@
+obj-$(CONFIG_CDD_IMU_BMI088) += bmi088.o

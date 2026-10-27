@@ -1,0 +1,3 @@
+subdir-$(CONFIG_COMPONENT_FILTER_LPF) += lpf
+subdir-$(CONFIG_COMPONENT_FILTER_MOVING_AVERAGE) += moving_average
+subdir-$(CONFIG_COMPONENT_FILTER_MEDIAN) += median
