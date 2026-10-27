@@ -1,198 +1,95 @@
 package com.example.hmi
 
-import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.hmi.ui.theme.HMITheme
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val link = HmiLink(this)
         setContent {
             HMITheme {
-                HmiScreen(link)
+                LedPage()
             }
         }
     }
 }
 
 @Composable
-private fun HmiScreen(link: HmiLink) {
-    var state by remember { mutableStateOf(HmiState()) }
-    val permission = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { granted ->
-        if (granted.values.all { it }) {
-            link.startScan()
-        } else {
-            link.showStatus("需要蓝牙权限")
-        }
-    }
+fun LedPage() {
+    var led1 by remember { mutableStateOf(false) }
+    var led2 by remember { mutableStateOf(false) }
+    var led3 by remember { mutableStateOf(false) }
 
-    DisposableEffect(link) {
-        link.setListener { state = it }
-        onDispose { link.close() }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF3F5F8))
+            .padding(horizontal = 20.dp, vertical = 28.dp),
+    ) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "HMI人机交互界面",
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1F2933),
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        LedRow("LED 1", led1, Color(0xFFE53935)) { led1 = !led1 }
+        LedRow("LED 2", led2, Color(0xFF43A047)) { led2 = !led2 }
+        LedRow("LED 3", led3, Color(0xFF1E88E5)) { led3 = !led3 }
     }
+}
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-        Column(
+@Composable
+private fun LedRow(name: String, on: Boolean, color: Color, onToggle: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text("HMI", style = MaterialTheme.typography.headlineMedium)
-            Text(state.status, style = MaterialTheme.typography.bodyLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = {
-                    permission.launch(
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.BLUETOOTH_SCAN,
-                        )
-                    )
-                }) {
-                    Text(if (state.scanning) "扫描中" else "扫描")
-                }
-                Button(onClick = { link.disconnect() }, enabled = state.connected) {
-                    Text("断开")
-                }
-            }
-            state.devices.forEach { device ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { link.connect(device) }
-                        .padding(vertical = 6.dp),
-                ) {
-                    Text(device.name)
-                    Text(device.address, style = MaterialTheme.typography.bodySmall)
-                }
-            }
-            HorizontalDivider()
-            Text("姿态", style = MaterialTheme.typography.titleMedium)
-            AngleRow("Roll", state.attitudeValid, state.roll)
-            AngleRow("Pitch", state.attitudeValid, state.pitch)
-            AngleRow("Yaw", state.attitudeValid, state.yaw)
-            HorizontalDivider()
-            HoldRow("蜂鸣器", "按住时响", state.buzzer, state.connected) { link.setBuzzer(it) }
-            ControlRow("LED", "拨动一次切换亮灭", state.led, state.connected) { link.setLed(it) }
+                .size(16.dp)
+                .background(if (on) color else Color(0xFFD1D5DB), CircleShape),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(text = name, fontSize = 18.sp, color = Color(0xFF1F2933))
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = if (on) "亮" else "灭",
+            fontSize = 16.sp,
+            color = if (on) color else Color(0xFF9CA3AF),
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        TextButton(onClick = onToggle) {
+            Text(text = if (on) "关闭" else "打开")
         }
-    }
-}
-
-@Composable
-private fun AngleRow(label: String, valid: Boolean, degrees: Float) {
-    val text = if (valid) String.format(Locale.US, "%7.2f°", degrees) else "   --"
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, style = MaterialTheme.typography.titleMedium)
-        Text(text, style = MaterialTheme.typography.titleLarge, fontFamily = FontFamily.Monospace)
-    }
-}
-
-@Composable
-private fun HoldRow(
-    title: String,
-    subtitle: String,
-    held: Boolean,
-    enabled: Boolean,
-    onHold: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall)
-        }
-        Surface(
-            color = if (held) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier.pointerInput(enabled) {
-                detectTapGestures(
-                    onPress = {
-                        if (!enabled) {
-                            return@detectTapGestures
-                        }
-                        onHold(true)
-                        tryAwaitRelease()
-                        onHold(false)
-                    },
-                )
-            },
-        ) {
-            Text(
-                if (held) "松开停止" else "按住",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                color = if (held) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun ControlRow(
-    title: String,
-    subtitle: String,
-    checked: Boolean,
-    enabled: Boolean,
-    onChecked: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall)
-        }
-        Switch(checked = checked, onCheckedChange = onChecked, enabled = enabled)
     }
 }
